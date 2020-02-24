@@ -6,7 +6,7 @@ import tensorflow as tf
 import logging
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
-from tensorflow.keras import layers, models
+from tf.keras import layers, models
 import model_params
 
 def make_model():

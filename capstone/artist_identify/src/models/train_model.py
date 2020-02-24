@@ -15,6 +15,7 @@ import run_config
 def train_model(model_basepath):
     """ Trains a model on the dataset.
     """
+
     with open(os.path.join(model_basepath, 'model_config.json')) as config_json:
         model_config = json.load(config_json)
     
@@ -23,13 +24,11 @@ def train_model(model_basepath):
         return data_source
 
     def _build_callbacks():
-        early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_acc', min_delta=1e-4, patience=10, verbose=1)
+        early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', min_delta=1e-4, patience=10, verbose=1)
         checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
                 filepath = os.path.join(model_config['BASE_PATH'], 'checkpoint'),
-                save_best_only = True,
-                monitor = 'val_acc',
-                verbose = 2,
-                mode='max')
+                monitor = 'val_accuracy',
+                verbose = train_config["VERBOSITY"])
 
         log_dir = os.path.join(model_config['BASE_PATH'], 'logs')
         file_writer = tf.summary.create_file_writer(log_dir)
@@ -42,9 +41,9 @@ def train_model(model_basepath):
     logger.info('begin model training')
 
     try:
-        model = tf.keras.model.load(os.path.join(model_config['BASE_PATH'], 'snapshot'))
+        model = tf.keras.models.load_model(os.path.join(model_config['BASE_PATH'], 'snapshot'))
     except:
-        model = tf.keras.model.load(os.path.join(model_config['BASE_PATH'], 'checkpoint'))
+        model = tf.keras.models.load_model(os.path.join(model_config['BASE_PATH'], 'checkpoint'))
 
     train_config = run_config.get()
     data_source = _init_data_source()
