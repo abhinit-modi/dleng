@@ -1,7 +1,7 @@
 image_search
 ==============================
 
-Image Search Inception to Consumption
+Artist Identification Inception to Consumption
 
 Project Organization
 ------------

@@ -3,7 +3,7 @@
 #################################################################################
 
 PROJECT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-PROJECT_NAME = image_search
+PROJECT_NAME = artist_identify
 PYTHON_INTERPRETER = python3
 
 ifeq (,$(shell which conda))
