@@ -10,7 +10,7 @@ import tensorflow as tf
 
 import run_config
 
-def prepare_data_generator():
+def prepare_train_data_generator():
     """ Builds the configuration for the model in this directoty.
     """
     logger = logging.getLogger(__name__)
@@ -29,6 +29,24 @@ def prepare_data_generator():
             class_mode="sparse")
 
     return train_generator
+
+def prepare_test_data_generator():
+    """ Builds the configuration for the model in this directoty.
+    """
+    logger = logging.getLogger(__name__)
+    data_config = run_config.get_data_config()
+
+    logger.info('Building data generator')
+    test_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
+        rescale=1./255)
+
+    test_generator = test_datagen.flow_from_directory(
+            os.path.join(data_config['DATA_DIR'], 'test'),
+            target_size=(224, 224),
+            batch_size=data_config['BATCH_SIZE'],
+            class_mode="sparse")
+
+    return test_generator
 
 def prepare_dataset_generator():
     data_config = run_config.get_data_config()

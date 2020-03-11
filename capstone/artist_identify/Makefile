@@ -71,3 +71,7 @@ test:
 ## Train Model
 train:
 	$(PYTHON_INTERPRETER) src/models/train_model.py $(BASE_PATH)
+
+## Train Model
+evaluate:
+	$(PYTHON_INTERPRETER) src/models/evaluate_model.py $(MODEL_PATH)
