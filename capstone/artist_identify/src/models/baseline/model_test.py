@@ -1,19 +1,22 @@
 # -*- coding: utf-8 -*-
 
+import click
 import json
 import numpy as np
+import model
+import model_params
+import os
 import tensorflow as tf
 import logging
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
 
-import model
 
 class ModelSanityTest(tf.test.TestCase):
     def setUp(self):
       super(ModelSanityTest, self).setUp()
-      self.test_model = tf.keras.model.load_model(model.make_model())
-    
+      self.test_model = tf.keras.models.load_model(os.path.join(model.make_model(), 'snapshot'))
+     
     def tearDown(self):
       del self.test_model
         
@@ -48,7 +51,7 @@ class ModelSanityTest(tf.test.TestCase):
       dummy_label = np.random.randint(low=0, high=45, size=1)
       history = self.test_model.fit(dummy_image_batch, dummy_label, epochs=10, 
                                     batch_size=1)
-      loss, accuracy = self.test_model.evaluate(dummy_image_batch, dummy_label)
+      loss, _ = self.test_model.evaluate(dummy_image_batch, dummy_label)
       self.assertEqual(loss, 0)
       print(history.history['loss'])
       self.assertTrue(history.history['loss'][-1] == 0, 
@@ -69,15 +72,14 @@ class ModelSanityTest(tf.test.TestCase):
       self.testWeightsUpdateOnStep()
       self.testOverFitSmallDataset()
       self.testZeroInputNonZeroInput()
-      
+
 def test_model():
     """ Unit tests the default model built from model.py.
     """
     logger = logging.getLogger(__name__)
 
     result = ModelSanityTest().run()
-    logger.log(result)
-
+    logger.info(result)
     return result
 
 

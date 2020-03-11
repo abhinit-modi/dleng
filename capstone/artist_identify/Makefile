@@ -57,13 +57,17 @@ test_environment:
 #################################################################################
 
 ## Make Dataset
-data: requirements
-	$(PYTHON_INTERPRETER) src/data/make_dataset.py data/raw data/processed
+dataset:
+	$(PYTHON_INTERPRETER) src/data/make_dataset.py $(INPUT) $(OUTPUT)
 
 ## Make Model
-model: requirements
-	$(PYTHON_INTERPRETER) src/models/$(MODEL)/model.py
+model:
+	$(PYTHON_INTERPRETER) ./src/models/$(MODEL)/model.py $(MODEL)
+
+## Make Model
+test: 
+	$(PYTHON_INTERPRETER) ./src/models/$(MODEL)/model_test.py $(MODEL)
 
 ## Train Model
-train: requirements
+train:
 	$(PYTHON_INTERPRETER) src/models/train_model.py $(BASE_PATH)

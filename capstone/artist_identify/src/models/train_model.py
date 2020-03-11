@@ -16,6 +16,7 @@ def train_model(model_basepath):
     """ Trains a model on the dataset.
     """
 
+    train_config = run_config.get_train_config()
     with open(os.path.join(model_basepath, 'model_config.json')) as config_json:
         model_config = json.load(config_json)
     
@@ -40,12 +41,7 @@ def train_model(model_basepath):
     logger = logging.getLogger(__name__)
     logger.info('begin model training')
 
-    try:
-        model = tf.keras.models.load_model(os.path.join(model_config['BASE_PATH'], 'snapshot'))
-    except:
-        model = tf.keras.models.load_model(os.path.join(model_config['BASE_PATH'], 'checkpoint'))
-
-    train_config = run_config.get()
+    model = tf.keras.models.load_model(os.path.join(model_config['BASE_PATH'], 'snapshot'))
     data_source = _init_data_source()
 
     model.fit(data_source, epochs = train_config["EPOCHS"],
@@ -54,6 +50,7 @@ def train_model(model_basepath):
     
     logger.info('saving model')
     model.save(os.path.join(model_config['BASE_PATH'], 'snapshot'), save_format='tf')
+    return model_config['BASE_PATH']
 
 
 if __name__ == '__main__':

@@ -6,7 +6,7 @@ import tensorflow as tf
 import logging
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
-from tf.keras import layers, models
+from tensorflow.keras import layers, models
 import model_params
 
 def make_model():
@@ -19,7 +19,7 @@ def make_model():
         if model is None:
             raise TypeError
 
-        compile_config = model_params.create_compile_config()
+        compile_config = model_params.get_compile_config()
         model.compile(optimizer=compile_config['OPTIMIZER'],
                         loss=compile_config['LOSS'],
                         metrics=compile_config['METRICS'])
@@ -28,9 +28,9 @@ def make_model():
 
     def _build_model():
         model = models.Sequential()
-        model.add(layers.Conv2D(filters=1, kernel_size=(3, 3), input_shape=(224, 224, 3), activation="relu", padding="same")) # check for stride
+        model.add(layers.Conv2D(filters=1, kernel_size=(3, 3), strides=(2, 2), input_shape=(224, 224, 3), activation="relu", padding="same")) # check for stride
         model.add(layers.MaxPooling2D(pool_size=(2, 2)))
-        model.add(layers.Conv2D(filters=1, kernel_size=(3, 3), activation="relu", padding="same")) # check for stride
+        model.add(layers.Conv2D(filters=1, kernel_size=(3, 3), strides=(2, 2), activation="relu", padding="same")) # check for stride
         model.add(layers.MaxPooling2D(pool_size=(2, 2)))
         model.add(layers.Flatten())
         model.add(layers.Dense(units=6272, activation="relu"))
@@ -41,8 +41,9 @@ def make_model():
     logger = logging.getLogger(__name__)
 
     # Create and save model config
-    model_config = model_params.create_model_config()
-    with open(os.path.join(model_config['BASE_PATH'], 'model_config.json'), 'w', encoding='utf-8') as f:
+    model_config = model_params.get_model_config()
+    os.makedirs(model_config['BASE_PATH'])
+    with open(os.path.join(model_config['BASE_PATH'], 'model_config.json'), 'w+', encoding='utf-8') as f:
         json.dump(model_config, f, ensure_ascii=False, indent=4)
 
     # Create and compile model
@@ -50,7 +51,7 @@ def make_model():
     model = _compile_model(model)
     logger.info(model.summary())
 
-    # Save model
+     # Save model
     model.save(os.path.join(model_config['BASE_PATH'], 'snapshot'), save_format='tf')
     
     return model_config['BASE_PATH']

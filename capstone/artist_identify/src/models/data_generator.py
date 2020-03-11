@@ -14,7 +14,7 @@ def prepare_data_generator():
     """ Builds the configuration for the model in this directoty.
     """
     logger = logging.getLogger(__name__)
-    config = run_config.get()
+    data_config = run_config.get_data_config()
 
     logger.info('Building data generator')
     train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
@@ -23,20 +23,20 @@ def prepare_data_generator():
         horizontal_flip=True)
 
     train_generator = train_datagen.flow_from_directory(
-            config['DATA_DIR'],
+            os.path.join(data_config['DATA_DIR'], 'train'),
             target_size=(224, 224),
-            batch_size=config['BATCH_SIZE'],
+            batch_size=data_config['BATCH_SIZE'],
             class_mode="sparse")
 
     return train_generator
 
 def prepare_dataset_generator():
-    config = run_config.get()
+    data_config = run_config.get_data_config()
 
-    SEED = config['DATA_SEED']
+    SEED = data_config['DATA_SEED']
     IMG_WIDTH = 224
     IMG_HEIGHT = 224
-    DATASET_SIZE = len(config['CLASS_NAMES'])*300
+    DATASET_SIZE = len(data_config['CLASS_NAMES'])*300
 
     def standardize(img):
         img = tf.image.per_image_standardization(img)
@@ -54,7 +54,7 @@ def prepare_dataset_generator():
         # convert the path to a list of path components
         parts = tf.strings.split(file_path, os.path.sep)
         # The second to last is the class-directory
-        return tf.reduce_min(tf.where(tf.equal(config['CLASS_NAMES'], parts[-2])))
+        return tf.reduce_min(tf.where(tf.equal(data_config['CLASS_NAMES'], parts[-2])))
 
     def decode_img(img):
         # convert the compressed string to a 3D uint8 tensor
@@ -72,7 +72,7 @@ def prepare_dataset_generator():
         img = randomize(img)
         return img, label
 
-    list_ds = tf.data.Dataset.list_files(os.path.join(config['DATA_DIR'], "*/*"))
+    list_ds = tf.data.Dataset.list_files(os.path.join(data_config['DATA_DIR'], "*/*"))
     labeled_ds = list_ds.map(process_path, num_parallel_calls=tf.data.experimental.AUTOTUNE)
 
     BATCH_SIZE = 32
@@ -83,4 +83,6 @@ def prepare_dataset_generator():
 
     train_ds = train_ds.shuffle(1000000).batch(batch_size=BATCH_SIZE).repeat(NUM_EPOCHS)
     test_ds = test_ds.batch(batch_size=BATCH_SIZE)
+
+    return train_ds, test_ds
 
