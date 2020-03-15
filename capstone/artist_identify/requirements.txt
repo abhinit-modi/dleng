@@ -4,5 +4,5 @@
 # external requirements
 click
 coverage
-flake8
+pylint
 python-dotenv>=0.5.1

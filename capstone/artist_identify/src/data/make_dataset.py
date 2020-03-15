@@ -1,52 +1,50 @@
-# -*- coding: utf-8 -*-
-import click
+""" Prepare training and test data """
+
 import logging
-from pathlib import Path
+import os
+import random
+import shutil
+
 from dotenv import find_dotenv, load_dotenv
 
-import os
-import shutil
-import random
+from dataset_params import DATASET_GENERATE_CONFIG
 
-N = 300
-SPLIT = 0.8
 
-@click.command()
-@click.argument('input_dir', type=click.Path(exists=True))
-@click.argument('output_dir', type=click.Path())
-def make_dataset(input_dir, output_dir):
-    """ Runs data processing scripts to turn raw data from (../raw) into
-        cleaned data ready to be analyzed (saved in ../processed).
+def make_dataset():
+    """ Runs data processing scripts to turn raw data from INPUT_DIR into
+        cleaned data ready to be analyzed (saved in OUTPUT_DIR).
     """
     logger = logging.getLogger(__name__)
-    logger.info('making final data set from raw data ' + input_dir)
-    
-    ROOTDIR = os.path.join(output_dir, "wikiart_sampled")
-    if os.path.isdir(ROOTDIR):
-        shutil.rmtree(ROOTDIR)
-    os.mkdir(ROOTDIR)
-    os.mkdir(os.path.join(ROOTDIR, "train"))
-    os.mkdir(os.path.join(ROOTDIR, "test"))
-    
-    dirs = os.listdir(input_dir)
+    logger.info('making final data set from raw data %s', DATASET_GENERATE_CONFIG['INPUT_DIR'])
+
+    if os.path.isdir(DATASET_GENERATE_CONFIG['OUTPUT_DIR']):
+        shutil.rmtree(DATASET_GENERATE_CONFIG['OUTPUT_DIR'])
+    os.mkdir(DATASET_GENERATE_CONFIG['OUTPUT_DIR'])
+    os.mkdir(os.path.join(DATASET_GENERATE_CONFIG['OUTPUT_DIR'], "train"))
+    os.mkdir(os.path.join(DATASET_GENERATE_CONFIG['OUTPUT_DIR'], "test"))
+
+    dirs = os.listdir(DATASET_GENERATE_CONFIG['INPUT_DIR'])
     fmap = {}
-    for d in dirs:
-        if not os.path.isdir(os.path.join(input_dir, d)):
+    for genre_dir in dirs:
+        if not os.path.isdir(os.path.join(DATASET_GENERATE_CONFIG['INPUT_DIR'], genre_dir)):
             continue
-        files = os.listdir(os.path.join(input_dir, d))
-        for f in  files:
-            author = f[:f.find('_')]
+        files = os.listdir(os.path.join(DATASET_GENERATE_CONFIG['INPUT_DIR'], genre_dir))
+        for im_file in files:
+            author = im_file[:im_file.find('_')]
             if author not in fmap:
                 fmap[author] = []
 
-            fmap[author].append((os.path.join(input_dir, d, f), os.path.join(ROOTDIR, '{split}', author, f[f.find('_')+1:])))
+            fmap[author].append(
+                os.path.join(DATASET_GENERATE_CONFIG['INPUT_DIR'], genre_dir, im_file),
+                os.path.join(DATASET_GENERATE_CONFIG['OUTPUT_DIR'], '{split}', author,
+                             im_file[im_file.find('_')+1:]))
 
     for author in fmap:
-        if len(fmap[author]) < N:
+        if len(fmap[author]) < DATASET_GENERATE_CONFIG['NUM_SAMPLES']:
             continue
 
-        os.mkdir(os.path.join(ROOTDIR, "train", author))
-        os.mkdir(os.path.join(ROOTDIR, "test", author))
+        os.mkdir(os.path.join(DATASET_GENERATE_CONFIG['OUTPUT_DIR'], "train", author))
+        os.mkdir(os.path.join(DATASET_GENERATE_CONFIG['OUTPUT_DIR'], "test", author))
 
         random.shuffle(fmap[author])
 
@@ -55,17 +53,15 @@ def make_dataset(input_dir, output_dir):
             if images[1] in copied:
                 continue
             copied.add(images[1])
-            shutil.copyfile(images[0], images[1].format(split = "train" if index*1.0/N <= SPLIT else "test"))
-            if len(copied) == N:
+            shutil.copyfile(images[0], images[1].format(
+                split="train" if index*1.0/DATASET_GENERATE_CONFIG['NUM_SAMPLES'] <= DATASET_GENERATE_CONFIG['SPLIT_RATIO'] else "test"))
+            if len(copied) == DATASET_GENERATE_CONFIG['NUM_SAMPLES']:
                 break
 
 
 if __name__ == '__main__':
-    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    logging.basicConfig(level=logging.INFO, format=log_fmt)
-
-    # not used in this stub but often useful for finding various files
-    project_dir = Path(__file__).resolve().parents[2]
+    LOG_FMT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    logging.basicConfig(level=logging.INFO, format=LOG_FMT)
 
     # find .env automagically by walking up directories until it's found, then
     # load up the .env entries as environment variables

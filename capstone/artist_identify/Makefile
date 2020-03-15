@@ -26,9 +26,9 @@ clean:
 	find . -type f -name "*.py[co]" -delete
 	find . -type d -name "__pycache__" -delete
 
-## Lint using flake8
+## Lint using pylint
 lint:
-	flake8 src
+	pylint src
 
 ## Set up python interpreter environment
 create_environment:
@@ -62,11 +62,11 @@ dataset:
 
 ## Make Model
 model:
-	$(PYTHON_INTERPRETER) ./src/models/$(MODEL)/model.py $(MODEL)
+	$(PYTHON_INTERPRETER) ./src/models/$(MODEL)/model.py
 
 ## Make Model
 test: 
-	$(PYTHON_INTERPRETER) ./src/models/$(MODEL)/model_test.py $(MODEL)
+	$(PYTHON_INTERPRETER) ./src/models/$(MODEL)/model_test.py $(MODEL_PATH)
 
 ## Train Model
 train:
@@ -75,3 +75,7 @@ train:
 ## Train Model
 evaluate:
 	$(PYTHON_INTERPRETER) src/models/evaluate_model.py $(MODEL_PATH)
+
+## Predict Sample
+predict:
+	$(PYTHON_INTERPRETER) src/models/predict_model.py $(MODEL_PATH) $(IMAGE_PATH)

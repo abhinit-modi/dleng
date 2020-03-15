@@ -1,4 +1,4 @@
-""" Unit testing models """
+""" Unit tests for model """
 
 import logging
 
@@ -11,7 +11,6 @@ from dotenv import find_dotenv, load_dotenv
 class ModelSanityTest(tf.test.TestCase):
     """ Unit tests.
     """
-
     def __init__(self, model_path):
         self.model_path = model_path
         tf.test.TestCase.__init__(self)
@@ -28,7 +27,7 @@ class ModelSanityTest(tf.test.TestCase):
                          (None, 224, 224, 3), "Input shape not as expected")
 
     def testModelOutputShape(self):
-        self.assertEqual(self.test_model.layers[-1].output_shape,
+        self.assertEqual(self.test_model.get_layer(index=-1).output_shape,
                          (None, 45), "Output shape not as expected")
 
     def testWeightsUpdateOnStep(self):
@@ -87,7 +86,6 @@ def test_model(model_path):
     result = ModelSanityTest(model_path).run()
     logger.info(result)
     return result
-
 
 if __name__ == '__main__':
     LOG_FMT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'

@@ -19,25 +19,26 @@ def make_model():
     def _compile_model(model):
         if model is None:
             raise TypeError
-
         model.compile(optimizer=COMPILE_CONFIG['OPTIMIZER'],
                       loss=COMPILE_CONFIG['LOSS'],
                       metrics=COMPILE_CONFIG['METRICS'])
         return model
 
-    def _build_model():
-        model = models.Sequential()
-        model.add(layers.Conv2D(filters=1, kernel_size=(3, 3), strides=(2, 2), input_shape=(
-            224, 224, 3), activation="relu", padding="same"))  # check for stride
-        model.add(layers.MaxPooling2D(pool_size=(2, 2)))
-        model.add(layers.Conv2D(filters=1, kernel_size=(3, 3), strides=(
-            2, 2), activation="relu", padding="same"))  # check for stride
-        model.add(layers.MaxPooling2D(pool_size=(2, 2)))
-        model.add(layers.Flatten())
-        model.add(layers.Dense(units=6272, activation="relu"))
-        model.add(layers.Dense(units=228, activation="relu"))
-        # Number of classes
-        model.add(layers.Dense(units=45, activation="softmax"))
+    def _build_model(pretrained_path):
+        base_model = models.load_model(pretrained_path)
+        base_model.trainable = False
+
+        global_average_layer = layers.GlobalAveragePooling2D()
+
+        fc_layer = layers.Dense(units=224, activation="relu")
+        prediction_layer = layers.Dense(units=45, activation="softmax")
+
+        model = models.Sequential([
+            base_model,
+            global_average_layer,
+            fc_layer,
+            prediction_layer
+        ])
         return model
 
     logger = logging.getLogger(__name__)
@@ -49,14 +50,13 @@ def make_model():
         json.dump(MODEL_CONFIG, config_file, ensure_ascii=False, indent=4)
 
     # Create and compile model
-    model = _build_model()
+    model = _build_model(MODEL_CONFIG['PRETRAINED_PATH'])
     model = _compile_model(model)
     logger.info(model.summary())
 
     # Save model
     model.save(os.path.join(
         MODEL_CONFIG['BASE_PATH'], MODEL_CONFIG['VERSION_ID']), save_format='tf')
-
     return MODEL_CONFIG['BASE_PATH']
 
 

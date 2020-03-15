@@ -5,7 +5,7 @@ import os
 
 from pathlib import Path
 
-MODEL_NAME = 'baseline'
+MODEL_NAME = 'resnet_transfer'
 ROOT_DIR = Path(__file__).resolve().parents[3]
 
 COMPILE_CONFIG = {
@@ -17,7 +17,8 @@ COMPILE_CONFIG = {
 MODEL_CONFIG = {
     'MODEL_NAME': MODEL_NAME,
     'VERSION_ID': str(0),
+    'PRETRAINED_PATH': os.path.join(ROOT_DIR, 'models', 'pretrained', 'resnet_18_no_top'),
     'BASE_PATH': os.path.join(ROOT_DIR, 'models', MODEL_NAME,
                               datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')),
-    'NOTES': "As per paper baseline."
+    'NOTES': "Resnet trasnfer learning, last layer training."
 }
