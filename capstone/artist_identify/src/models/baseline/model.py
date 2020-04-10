@@ -30,9 +30,11 @@ def make_model():
         model.add(layers.Conv2D(filters=1, kernel_size=(3, 3), strides=(2, 2), input_shape=(
             224, 224, 3), activation="relu", padding="same"))  # check for stride
         model.add(layers.MaxPooling2D(pool_size=(2, 2)))
+        model.add(layers.BatchNormalization())
         model.add(layers.Conv2D(filters=1, kernel_size=(3, 3), strides=(
             2, 2), activation="relu", padding="same"))  # check for stride
         model.add(layers.MaxPooling2D(pool_size=(2, 2)))
+        model.add(layers.BatchNormalization())
         model.add(layers.Flatten())
         model.add(layers.Dense(units=6272, activation="relu"))
         model.add(layers.Dense(units=228, activation="relu"))

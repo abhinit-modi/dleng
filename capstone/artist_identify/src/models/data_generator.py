@@ -14,10 +14,18 @@ def prepare_train_data_generator():
 
     logger.info('Building data generator')
 
+    def pad_or_crop(image):
+        return tf.image.resize_with_crop_or_pad(
+            image, DATA_PROCESSING_CONFIG['IMAGE_SIZE'][0], DATA_PROCESSING_CONFIG['IMAGE_SIZE'][1]
+        )
+
     train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
-        rescale=DATA_PROCESSING_CONFIG['RESCALE_FACTOR'],
+        # rescale=DATA_PROCESSING_CONFIG['RESCALE_FACTOR'],
+        samplewise_center=True,
+        samplewise_std_normalization=True,
         validation_split=DATA_PROCESSING_CONFIG['VALIDATION_SPLIT'],
-        horizontal_flip=True)
+        horizontal_flip=True,
+        preprocessing_function=pad_or_crop)
 
     train_generator = train_datagen.flow_from_directory(
         os.path.join(DATA_PROCESSING_CONFIG['DATA_DIR'], 'train'),

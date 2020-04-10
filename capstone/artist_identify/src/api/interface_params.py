@@ -1,8 +1,7 @@
 """ All config for translating client and server responses """
 
 SERVICE_CONFIG = {
-    'API_ENDPOINT': '',
-
+    'API_ENDPOINT': 'http://localhost:8501/v1/models/my_baseline:predict',
 }
 
 CONTRACT_CONFIG = {

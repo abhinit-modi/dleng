@@ -13,7 +13,7 @@ from interface_params import CONTRACT_CONFIG, SERVICE_CONFIG
 
 
 @click.command()
-@click.argument('model_path', type=click.Path(exists=True))
+@click.argument('image_path', type=click.Path(exists=True))
 def request_prediction(image_path):
     """ Read the image, send bytes to tf server for prediction.
     """

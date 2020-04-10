@@ -18,7 +18,7 @@ MODEL_TAINING_CONFIG = {
 
 DATA_PROCESSING_CONFIG = {
     'IMAGE_SIZE': (224, 224),
-    'VALIDATION_SPLIT': 0.15,
+    'VALIDATION_SPLIT': 0.125,
     'RESCALE_FACTOR': 1./255,
     'DATA_SEED': 1237,
     'DATA_DIR': os.path.join(ROOT_DIR, 'data', 'processed', 'wikiart_sampled'),

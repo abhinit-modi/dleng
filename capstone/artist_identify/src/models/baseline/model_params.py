@@ -19,5 +19,6 @@ MODEL_CONFIG = {
     'VERSION_ID': str(0),
     'BASE_PATH': os.path.join(ROOT_DIR, 'models', MODEL_NAME,
                               datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')),
-    'NOTES': "As per paper baseline."
+    'NOTES': "As per paper baseline. Avoided rescale and added center crop instead. \
+        Reduced val split. Added batch norm."
 }
