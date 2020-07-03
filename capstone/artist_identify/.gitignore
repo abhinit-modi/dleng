@@ -91,4 +91,5 @@ target/
 # Mypy cache
 .mypy_cache/
 
-./artist_identify
+# Virtual environment
+/artist_identify
