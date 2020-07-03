@@ -5,4 +5,10 @@
 click
 coverage
 pylint
+matplotlib
+numpy
+pandas
+tensorflow
+Pillow
+virtualenv
 python-dotenv>=0.5.1

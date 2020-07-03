@@ -1,4 +1,4 @@
-""" All config for dataset generation """
+""" All config for dataset preparation """
 
 import os
 

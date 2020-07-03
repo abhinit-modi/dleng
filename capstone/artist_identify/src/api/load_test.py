@@ -9,12 +9,19 @@ from concurrent.futures import ThreadPoolExecutor
 from timeit import default_timer
 
 import numpy as np
+import pandas as pd
 import requests
 from dotenv import find_dotenv, load_dotenv
 from tensorflow.keras.preprocessing import image
 
-from interface_params import CONTRACT_CONFIG, SERVICE_CONFIG
+from configs import CONTRACT_CONFIG, LOAD_TEST_CONFIG
 
+RESPONSE_TIMES = []
+
+def publish_stats():
+    """Dump latency into csv"""
+    df_times = pd.Series(RESPONSE_TIMES)
+    print(df_times.describe(percentiles=LOAD_TEST_CONFIG['PERCENTILES']))
 
 def request_prediction(session, image_path):
     """ Read the image, send bytes to tf server for prediction.
@@ -32,10 +39,11 @@ def request_prediction(session, image_path):
     start_time = default_timer()
 
     # sending post request to TensorFlow Serving server
-    with session.post(SERVICE_CONFIG['API_ENDPOINT'], json=payload) as resp:
+    with session.post(LOAD_TEST_CONFIG['MODEL_ENDPOINT'], json=payload) as resp:
         elapsed = default_timer() - start_time
-        time_completed_at = "{:5.2f}s".format(elapsed)
+        time_completed_at = "{:5.4f}s".format(elapsed)
         print("{0:<30} {1:>20}".format(image_path, time_completed_at))
+        RESPONSE_TIMES.append(elapsed)
 
         # Decode response
         pred = json.loads(resp.content.decode('utf-8'))
@@ -48,12 +56,10 @@ async def get_data_asynchronous():
     """ Set up and run to async function in loop to fetch predictions for multiple
         images concurrently.
     """
-    base_path = "/Users/abmodi/2020/dleng/capstone/\
-        artist_identify/data/processed/wikiart_sampled/test"
+    base_path = LOAD_TEST_CONFIG['SOURCE_DIR']
     artist_dirs = os.listdir(base_path)
-    number_of_images = 50
     images_to_predict = set()
-    while len(images_to_predict) < number_of_images:
+    while len(images_to_predict) < LOAD_TEST_CONFIG['NUM_SAMPLES']:
         artist_dir = random.choice(artist_dirs)
         image_file = random.choice(os.listdir(os.path.join(base_path, artist_dir)))
         if image_file not in images_to_predict:
@@ -81,6 +87,7 @@ def main():
     loop = asyncio.get_event_loop()
     future = asyncio.ensure_future(get_data_asynchronous())
     loop.run_until_complete(future)
+    publish_stats()
 
 if __name__ == '__main__':
     LOG_FMT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'

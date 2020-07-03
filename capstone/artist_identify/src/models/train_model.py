@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 from dotenv import find_dotenv, load_dotenv
 
-import data_generator
+from src.features import build_features
 from run_params import MODEL_TAINING_CONFIG
 
 
@@ -33,7 +33,7 @@ def train_model(model_basepath):
         model_config = json.load(config_json)
 
     def _init_data_source():
-        train_source, val_source = data_generator.prepare_train_data_generator()
+        train_source, val_source = build_features.train_data_generator()
         return train_source, val_source
 
     def _build_callbacks():

@@ -6,7 +6,7 @@ import click
 import tensorflow as tf
 from dotenv import find_dotenv, load_dotenv
 
-import data_generator
+from src.features import build_features
 
 
 @click.command()
@@ -15,7 +15,7 @@ def evaluate_model(model_path):
     """ Evaluates model on the dataset.
     """
     def _init_data_source():
-        data_source = data_generator.prepare_test_data_generator()
+        data_source = build_features.test_data_generator()
         return data_source
 
     logger = logging.getLogger(__name__)

@@ -51,12 +51,10 @@ class ModelSanityTest(tf.test.TestCase):
     def testOverFitSmallDataset(self):
         dummy_image_batch = np.random.rand(1, 224, 224, 3)
         dummy_label = np.random.randint(low=0, high=45, size=1)
-        history = self.test_model.fit(dummy_image_batch, dummy_label, epochs=10,
+        history = self.test_model.fit(dummy_image_batch, dummy_label, epochs=20,
                                       batch_size=1)
-        loss, _ = self.test_model.evaluate(dummy_image_batch, dummy_label)
-        self.assertEqual(loss, 0)
         print(history.history['loss'])
-        self.assertTrue(history.history['loss'][-1] == 0,
+        self.assertTrue(round(history.history['loss'][-1], 4) == 0,
                         "Loss not zero, unable to overfit")
 
     def testZeroInputNonZeroInput(self):
@@ -84,7 +82,10 @@ def test_model(model_path):
     logger = logging.getLogger(__name__)
 
     result = ModelSanityTest(model_path).run()
-    logger.info(result)
+    logger.info("Errors:")
+    logger.info(result.errors)
+    logger.info("Failures:")
+    logger.info(result.failures)
     return result
 
 if __name__ == '__main__':

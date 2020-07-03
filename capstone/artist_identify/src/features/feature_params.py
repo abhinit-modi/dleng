@@ -1,10 +1,18 @@
-""" All config for translating client and server responses """
+""" All config for feature preparation """
 
-SERVICE_CONFIG = {
-    'API_ENDPOINT': 'http://localhost:8501/v1/models/my_baseline:predict',
-}
+from pathlib import Path
+import os
 
-CONTRACT_CONFIG = {
+
+BATCH_SIZE = 32
+ROOT_DIR = str(Path(__file__).resolve().parents[2])
+
+DATA_PROCESSING_CONFIG = {
+    'IMAGE_SIZE': (224, 224),
+    'VALIDATION_SPLIT': 0.125,
+    'RESCALE_FACTOR': 1./255,
+    'DATA_SEED': 1237,
+    'DATA_DIR': os.path.join(ROOT_DIR, 'data', 'processed', 'wikiart_sampled'),
     'CLASSES': ['albrecht-durer', 'alfred-sisley', 'amedeo-modigliani', 'boris-kustodiev',
                 'camille-corot', 'camille-pissarro', 'childe-hassam', 'claude-monet',
                 'david-burliuk', 'edgar-degas', 'ernst-ludwig-kirchner', 'eugene-boudin',
@@ -17,6 +25,5 @@ CONTRACT_CONFIG = {
                 'raphael-kirchner', 'rembrandt', 'salvador-dali', 'sam-francis', 'thomas-eakins',
                 'utagawa-kuniyoshi', 'vincent-van-gogh', 'william-merritt-chase',
                 'zinaida-serebriakova'],
-    'IMAGE_SIZE': (224, 224),
-    'RESCALE_FACTOR': 1./255
+    'BATCH_SIZE': BATCH_SIZE,
 }

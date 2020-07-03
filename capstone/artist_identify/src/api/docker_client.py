@@ -9,11 +9,12 @@ import requests
 from dotenv import find_dotenv, load_dotenv
 from tensorflow.keras.preprocessing import image
 
-from interface_params import CONTRACT_CONFIG, SERVICE_CONFIG
+from configs import CONTRACT_CONFIG, SERVICE_CONFIG
 
 
 @click.command()
 @click.argument('image_path', type=click.Path(exists=True))
+@click.argument('model_endpoint')
 def request_prediction(image_path):
     """ Read the image, send bytes to tf server for prediction.
     """
@@ -29,7 +30,7 @@ def request_prediction(image_path):
 
     # sending post request to TensorFlow Serving server
     resp = requests.post(
-        SERVICE_CONFIG['API_ENDPOINT'], json=payload)
+        model_endpoint, json=payload)
     pred = json.loads(resp.content.decode('utf-8'))
     print(np.array(pred['predictions']))
 
