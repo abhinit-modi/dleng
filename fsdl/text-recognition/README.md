@@ -1,7 +1,6 @@
-image_search
 ==============================
 
-Artist Identification Inception to Consumption
+Learning DL
 
 Project Organization
 ------------
